@@ -9,7 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
         $.ajax({
-            'url': 'http://localhost/Insecure Version/home.php',
+            'url': 'http://localhost/Secure Version/home.php',
             'type': 'post',
             'data': { 'question': '<iframe id = "hack" width="560" height="315" src=\"https://www.youtube.com/embed/R_Gmiw2SnuI?autoplay=1&mute=1&loop=1\" frameborder="0" allowfullscreen allow="autoplay");\"></iframe>' }
         });
