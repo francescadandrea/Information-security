@@ -1,8 +1,9 @@
-<?php 
+<?php
 
   include('authentication.php');
 
-  if (!isset($_COOKIE['user'])) {
+  if (!isset($_SESSION['username'])) {
+  	$_SESSION['msg'] = "You must log in first";
   	header('location: login.php');
   }
 ?>
@@ -19,16 +20,11 @@
 $dbhost = 'localhost';
 $dbusername = 'root';
 $dbpassword = '';
-$database = 'forum';
-$database_connection = mysqli_connect($dbhost, $dbusername, $dbpassword, $database);
+$database = 'secureforum';
+$db = mysqli_connect($dbhost, $dbusername, $dbpassword, $database);
+$token = $_SESSION['_token'];
 
 $question = $_GET['question'];
-
-$sql = "SELECT * FROM `answers` WHERE question='$question'";
-$question_query = mysqli_query($database_connection, $sql);
-$question_data = mysqli_fetch_assoc($question_query);
-$question = $question_data['question'];
-
 
 echo "<form method='POST'>
 		<div class='single-question'>
@@ -38,19 +34,20 @@ echo "<form method='POST'>
 			<br/><br/>
 			<input type='submit'  value='Insert answer'/>
 		</div>
+		<input type='hidden' name='_token'  value='$token'/>
 	</form>
 ";
-	
+
 if ( isset($_POST['answer'] ) && !empty($_POST['answer'])) {
 
-	$answer = $_POST['answer'];
-	$username = $_COOKIE['user'];
+	$answer = mysqli_real_escape_string($db, $_POST['answer']);
+	$username = $_SESSION['username'];
 
 	// This query will add the question to the mysql database, note that we are substituting
 	// the $query variable in the below query.
-	$query = "UPDATE `answers` SET answer='$answer', username='$username' WHERE question='$question'";
-
-	mysqli_query($database_connection, $query);
+	$query = $db -> prepare("UPDATE `answers` SET answer=?, username=? WHERE question=?");
+	$query->bind_param("sss", $answer, $username, $question);
+	$query->execute();
 	header("Location: home.php");
 }
 ?>
